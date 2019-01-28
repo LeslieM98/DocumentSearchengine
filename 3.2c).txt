@@ -1,0 +1,20 @@
+"olympics opening ceremony"
+Accumulator [did=1259522, score=129.59520475067774]
+Accumulator [did=1232599, score=122.52414613897996]
+Accumulator [did=1229438, score=113.73633190102855]
+Accumulator [did=1235575, score=110.86616792996334]
+Accumulator [did=1235491, score=101.52638562613444]
+
+"denmark sweden bridge"
+Accumulator [did=1229543, score=199.76847347298582]
+Accumulator [did=1229484, score=136.76986873956838]
+Accumulator [did=1237142, score=119.96195751506662]
+Accumulator [did=1218647, score=108.71552399802911]
+Accumulator [did=1210109, score=93.72027930864579]
+
+"tokyo train disaster"
+Accumulator [did=1216849, score=126.98233190385518]
+Accumulator [did=1243203, score=114.01328589994083]
+Accumulator [did=1236859, score=99.20402262181796]
+Accumulator [did=1253846, score=83.24984742468843]
+Accumulator [did=1201724, score=81.06368949269579]
