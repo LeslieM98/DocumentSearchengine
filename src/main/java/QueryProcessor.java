@@ -210,7 +210,12 @@ public class QueryProcessor {
 		return in;
 	}
 
-
+	/**
+	 * Boosts the given document if the title contains terms from the query.
+	 * @param in The document to boost.
+	 * @param query The query given by the user.
+	 * @return A reference to in.
+	 */
 	private Accumulator boostByTitle(Accumulator in, String[] query) {
 		final String sql = "SELECT title FROM docs WHERE did = ?";
 
