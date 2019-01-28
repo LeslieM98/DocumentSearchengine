@@ -9,7 +9,7 @@ import java.sql.*;
 public class DatabaseConnection {
 
 	//the path to the sqlite database 
-	private static final String SQCONN = "jdbc:sqlite:/home/leslie/InformationRetrieval/nyt.sqlite";
+	private static final String SQCONN = "jdbc:sqlite:nyt.db";
 
 	/**
 	 * A function that connect to a given database 
