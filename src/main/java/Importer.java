@@ -145,7 +145,7 @@ public class Importer {
     }
 
     public static void main(String[] args) {
-        String dbPath = "C:\\Users\\Leslie\\Desktop\\Information Retrievel Prog Ueb 1\\sql\\nyt.sqlite";
+        String dbPath = "nyt.db";
         String nytPath = "C:\\Users\\Leslie\\Desktop\\nyt\\data";
 
         Importer importer = new Importer(dbPath);
