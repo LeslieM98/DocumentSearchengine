@@ -26,9 +26,9 @@ public class QueryProcessor {
 
 	private final long newestDate;
 	private final long oldestDate;
-	private final double dateRelevanceBoostWeight = 1;
+	private final double dateRelevanceBoostWeight = 0.4;
 
-	private final double titleRelevanceBoostWeight = 1;
+	private final double titleRelevanceBoostWeight = 0.4;
 
 	
 
