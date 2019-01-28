@@ -36,6 +36,7 @@ public class Parser {
         doc.setId(nytDoc.getGuid());
         doc.setURL(nytDoc.getUrl().toString());
         doc.setTitle(nytDoc.getHeadline());
+        doc.setDate(nytDoc.getPublicationDate());
 
         // get document content
         String body = (nytDoc.getBody() == null ? "" : nytDoc.getBody());

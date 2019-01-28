@@ -68,7 +68,7 @@ public class Importer {
             conn.setAutoCommit(false);
 
             // prepare statements
-            insertDoc = conn.prepareStatement("INSERT INTO docs (did, title, url) VALUES (?, ?, ?)");
+            insertDoc = conn.prepareStatement("INSERT INTO docs (did, title, url, date) VALUES (?, ?, ?, ?)");
             insertTfs = conn.prepareStatement("INSERT INTO tfs (did, term, tf) VALUES (?, ?, ?)");
 
             // recursively traverse given directory
@@ -85,6 +85,7 @@ public class Importer {
                 insertDoc.setLong(1, doc.getId());
                 insertDoc.setString(2, doc.getTitle());
                 insertDoc.setString(3, doc.getURL());
+                insertDoc.setLong(4, doc.getDate().getTime());
                 insertDoc.addBatch();
 
                 // determine term frequencies

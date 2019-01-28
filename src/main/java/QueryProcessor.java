@@ -1,6 +1,7 @@
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.Set;
+import java.sql.*;
 
 /**
  * A Query Builder for the search engine
@@ -22,10 +24,35 @@ public class QueryProcessor {
 	private final ExecutorCompletionService<Map<Long, Accumulator>> threadQueue = new ExecutorCompletionService<>(threadManager);
 	private static final InvertedIndex ix = new InvertedIndex();
 
+	private final long newestDate;
+	private final long oldestDate;
+	private final double dateRelevanceBoostWeight = 1;
+
+	private final double titleRelevanceBoostWeight = 1;
+
+	
+
 	/**
 	 * Default constructor
 	 */
 	public QueryProcessor() {
+		final String newestDateSQL = "SELECT date FROM docs ORDER BY date DESC LIMIT 1";
+		final String oldestDateSQL = "SELECT date FROM docs ORDER BY date ASC LIMIT 1;";
+		try{
+			Connection conn = DatabaseConnection.getConnection();
+
+			PreparedStatement query = conn.prepareStatement(newestDateSQL);
+			ResultSet rs = query.executeQuery();
+			newestDate = rs.getLong("date");
+			rs.close();
+
+			query = conn.prepareStatement(oldestDateSQL);
+			rs = query.executeQuery();
+			oldestDate = rs.getLong("date");
+			rs.close();
+		} catch (Exception e){
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 
 
@@ -119,9 +146,13 @@ public class QueryProcessor {
 			threadCount--;
 		}
 
-		result = map.values().stream().sorted().collect(Collectors.toList());
 		threadManager.shutdown();
 
+		result = map.values().stream()
+			.map(x -> boostByTitle(x, queryNormalizedAndToknized))
+			.map(this::boostByDate)
+			.sorted()
+			.collect(Collectors.toList());
 		return result;
 	}
 
@@ -140,6 +171,105 @@ public class QueryProcessor {
 			return result;
 		}
 		return result.subList(0, k);
+	}
+
+	/**
+	 * Boosts the score of a Document based on how recent it was published
+	 * @param in The document that will be boosted
+	 * @return A reference to the boosted document
+	 */
+	private Accumulator boostByDate(Accumulator in) {
+
+		final String sql = "SELECT date FROM docs WHERE did = ?";
+
+		Connection conn;
+		PreparedStatement query;
+		try {	
+			conn = DatabaseConnection.getConnection();
+			query = conn.prepareStatement(sql);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+		long time = oldestDate;
+		try{
+			query.setLong(1, in.getDid());
+			ResultSet rs = query.executeQuery();
+			time = rs.getLong("date");
+			rs.close();
+		} catch(Exception e){
+			e.printStackTrace();
+			return in;
+		}
+
+		long tmp = time - oldestDate;
+		double boost = (double) tmp / (newestDate - oldestDate);
+		boost = 1 + dateRelevanceBoostWeight * boost;
+		in.setScore(in.getScore() * boost);
+
+		return in;
+	}
+
+
+	private Accumulator boostByTitle(Accumulator in, String[] query) {
+		final String sql = "SELECT title FROM docs WHERE did = ?";
+
+		Connection conn;
+		PreparedStatement sqlQuery;
+		try {	
+			conn = DatabaseConnection.getConnection();
+			sqlQuery = conn.prepareStatement(sql);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+		String title;
+		try{
+			sqlQuery.setLong(1, in.getDid());
+			ResultSet rs = sqlQuery.executeQuery();
+			title = rs.getString("Title");
+			rs.close();
+		} catch(Exception e){
+			e.printStackTrace();
+			return in;
+		}
+
+        // remove HTML tags
+        title = title.replaceAll("<[^<>]+>", " ");
+
+        // remove all characters that are neither a letter, a number or a full stop
+        title = title.replaceAll("[^a-zA-Z0-9\\.]", " ");
+
+        // remove all full stops before a white space that are not preceded by another full stop in the same word
+        char[] titleChars = title.toCharArray();
+        int stopSeen = 0;
+        for (int i = 0; i < titleChars.length; i++) {
+            if(titleChars[i] == ' ') {
+                if (i > 0 && titleChars[i-1] == '.') {
+                    if (stopSeen < 2) {
+                        titleChars[i-1] = ' ';
+                    }
+                }
+                stopSeen = 0;
+            } else if (titleChars[i] == '.') {
+                stopSeen++;
+            }
+        }
+
+        // convert to lower case
+        title = (new String(titleChars)).toLowerCase();
+
+        // split at sequences of white spaces
+		List<String> titleContent = Arrays.asList(title.split("[\\s]+"));
+		int occurances = 0;
+		for (String x : query) {
+			occurances = (titleContent.contains(x)) ? occurances + 1 : occurances;
+		}
+
+		double boost = 1 + titleRelevanceBoostWeight * (occurances / query.length);
+		in.setScore(in.getScore() * boost);
+
+		return in;
 	}
 
 	/**

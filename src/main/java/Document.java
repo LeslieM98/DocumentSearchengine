@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Date;
 import java.sql.*;
 
 /**
@@ -17,6 +18,9 @@ public class Document {
     // URL where the document can be looked up
     private String url;
 
+    // Date when the Document was published
+    private Date date;
+
     // Document content as a sequence of tokens
     private String[] content;
 
@@ -24,7 +28,7 @@ public class Document {
 
     }
 
-    public Document(long id, String titel, String url) {
+    public Document(long id, String titel, String url, Date date) {
         this.id = id;
         this.title = titel;
         this.url = url;
@@ -40,7 +44,7 @@ public class Document {
     public Document(long id){
         setId(id);
         try {
-            final String sql = "SELECT title, url FROM docs WHERE did = ?";
+            final String sql = "SELECT title, url, date FROM docs WHERE did = ?";
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement query = conn.prepareStatement(sql);
             query.setLong(1, id);
@@ -48,6 +52,7 @@ public class Document {
             ResultSet doc = query.executeQuery();
             setTitle(doc.getString("title"));
             setURL(doc.getString("url"));
+            setDate(new Date(doc.getLong("date")));
             doc.close();
         } catch (Exception e) {
             System.err.println("Unexpected error while creating Document data");
@@ -55,6 +60,8 @@ public class Document {
         }
         
     }
+
+
 
     public long getId() {
         return id;
@@ -86,6 +93,14 @@ public class Document {
 
     public void setContent(String[] content) {
         this.content = content;
+    }
+
+    public void setDate(Date date){
+        this.date = date;
+    }
+
+    public Date getDate(){
+        return date;
     }
 
     @Override

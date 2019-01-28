@@ -1,22 +1,9 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
     private final Scanner in = new Scanner(System.in);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
