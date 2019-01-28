@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.sql.*;
 
 /**
  * Encapsulates a parsed & normalized document ready to be indexed.
@@ -34,6 +35,25 @@ public class Document {
         this.title = titel;
         this.url = url;
         this.content = content;
+    }
+
+    public Document(long id){
+        setId(id);
+        try {
+            final String sql = "SELECT title, url FROM docs WHERE did = ?";
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement query = conn.prepareStatement(sql);
+            query.setLong(1, id);
+
+            ResultSet doc = query.executeQuery();
+            setTitle(doc.getString("title"));
+            setURL(doc.getString("url"));
+            doc.close();
+        } catch (Exception e) {
+            System.err.println("Unexpected error while creating Document data");
+            e.printStackTrace();
+        }
+        
     }
 
     public long getId() {
