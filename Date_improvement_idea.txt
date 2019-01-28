@@ -3,4 +3,4 @@ Die Daten werden als unixtime codiert in der datenbank gespeichert (siehe sql/sc
 einfach mit mehreren Daten rechnen. Der Boostwert x beschreibt effektiv wo prozentual sich das 
 momentane Dokument jeweils zwischen dem neusten und ältesten dokument zeitlich befindet.
 Dieser Boostwert wird am ende noch mit einer gewichtung n multipliziert (0.0 < n < 1.0) um zu bestimmen wie stark die dokumente geboosted werden.
-Implementiert in QueryProcessor.
+Implementiert in QueryProcessor.boostByDate()

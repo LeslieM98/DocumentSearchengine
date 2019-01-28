@@ -1,0 +1,4 @@
+Die idee ist, für jeden Term im Query wird im Titel des Dokument nachgesehen wie oft die terme kombiniert vorkommen. 
+Diese kombinierte anzahl wird dann durch die term anzahl im query geteilt und darauf hin wiederunm mit einer gewichtung n (0.0 < n < 1.0) verrechnet.
+Das gesamt boost ergebnis wird dann mit dem Dokumentenscore multipliziert.
+Implementiert in QueryProcessor.boostByTitle().
