@@ -227,10 +227,14 @@ public class QueryProcessor {
 		try{
 			sqlQuery.setLong(1, in.getDid());
 			ResultSet rs = sqlQuery.executeQuery();
-			title = rs.getString("Title");
+			title = rs.getString("title");
 			rs.close();
 		} catch(Exception e){
 			e.printStackTrace();
+			return in;
+		}
+
+		if (title == null) {
 			return in;
 		}
 
